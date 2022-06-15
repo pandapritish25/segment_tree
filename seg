@@ -1,0 +1,409 @@
+// query for getting sum of a particular range
+
+
+void build_segtree(int *arr,int *tree,int start,int end,int tree_node){
+  if(start==end){
+    tree[tree_node]=arr[start];;
+    return;
+  }
+  int mid=(start+end)/2;
+  build_segtree(arr,tree,start,mid,2*tree_node);
+  build_segtree(arr,tree,mid+1,end,2*tree_node+1);
+  tree[tree_node]=tree[2*tree_node]+tree[2*tree_node+1];
+}
+
+void update_segtree(int *arr,int *tree,int start,int end,int tree_node,int idx,int value){
+  if(start==end){
+    arr[idx]=value;
+    tree[tree_node]=value;  
+    return;
+  }
+  int mid=(start+end)/2;
+  if(idx > mid){
+    update_segtree(arr,tree,mid+1,end,2*tree_node+1,idx,value);
+  }
+  else{
+    update_segtree(arr,tree,start,mid,2*tree_node,idx,value);
+  }
+  tree[tree_node]=tree[2*tree_node]+tree[2*tree_node+1];
+}
+
+int range_query(int *tree,int start,int end,int tree_node,int left,int right){
+  if(start > right || end < left){
+    return 0;
+  }
+  if(start >= left && end <= right){
+    return tree[tree_node];
+  }
+  int mid=(start+end)/2;
+  int ans1=range_query(tree,start,mid,2*tree_node,left,right);
+  int ans2=range_query(tree,mid+1,end,2*tree_node+1,left,right);
+  return ans1+ans2;
+}
+
+
+// query for getting maximum in a given range
+
+void build_segtree(int *arr,int*tree,int start,int end,int tree_node){
+  if(start == end){
+    tree[tree_node]=arr[start];
+    return;
+  }
+  int mid=(start+end)/2;
+  build_segtree(arr,tree,start,mid,2*tree_node);
+  build_segtree(arr,tree,mid+1,end,2*tree_node+1);
+  tree[tree_node]=max(tree[2*tree_node],tree[2*tree_node+1]);
+}
+void update_segtree(int *arr,int *tree,int start,int end,int tree_node,int idx,int value){
+  if(start == end){
+    arr[idx]=value;  
+    tree[tree_node]=value;
+    return;
+  }
+  int mid=(start+end)/2;
+  if(idx > mid){
+    update_segtree(arr,tree,mid+1,end,2*tree_node+1,idx,value);
+  }
+  else{
+   update_segtree(arr,tree,start,mid,2*tree_node,idx,value); 
+  }
+  tree[tree_node]=max(tree[2*tree_node],tree[2*tree_node+1]);
+}
+int range_query(int *tree,int start,int end,int tree_node,int left,int right){
+  if(start > right || end < left){
+    return  0;
+  }
+  if(start >= left&& end <= right){
+    return tree[tree_node];
+  }
+  int mid=(start+end)/2;
+  int ans1=range_query(tree,start,mid,2*tree_node,left,right);
+  int ans2=range_query(tree,mid+1,end,2*tree_node+1,left,right);
+  return max(ans1,ans2);
+}
+
+
+// maximum element with the frequency in a particular range
+// using trees segment trees basically creating a function in which storing a pair iin each treenode
+
+const int max1=1000;
+pair<int,int> tree [4*max1];
+pair<int,int> combine(pair<int,int> a,pair<int,int> b){
+  if(a.ff > b.ff){
+    return a;
+  }
+  if(b.ff > a.ff){
+    return b;
+  }
+  return make_pair(a.ff,a.ss+b.ss);
+}
+void build_segtree(int *arr,int start,int end,int tree_node){
+  if(start==end){ 
+    tree[tree_node]=make_pair(arr[start],1);
+  }
+  else{
+    int mid=(start+end)/2;
+    build_segtree(arr,start,mid,2*tree_node);
+    build_segtree(arr,mid+1,end,2*tree_node+1);
+    tree[tree_node]=combine(tree[2*tree_node],tree[2*tree_node+1]);
+  }
+}
+
+void update_segtree(int *arr,int start,int end,int tree_node,int idx,int value){
+  if(start==end){
+    arr[idx]=value;
+    tree[tree_node]=make_pair(value,1);
+    return;
+  }
+  int mid=(start+end)/2;
+  if(idx > mid){
+    update_segtree(arr,mid+1,end,2*tree_node+1,idx,value);
+  }
+  else{
+    update_segtree(arr,start,mid,2*tree_node,idx,value); 
+  }
+  tree[tree_node]=combine(tree[2*tree_node],tree[2*tree_node+1]);
+}
+
+pair<int,int> range_query(int start,int end,int tree_node,int left,int right){
+  if(left > right){
+    pair<int,int> p1=make_pair(-INF,0);
+    return p1;
+  }
+  if(left== start && right== end){
+    return tree[tree_node];
+  }
+  int mid=(start+end)/2;
+  return combine(range_query(start,mid,2*tree_node,left,min(mid,right)),range_query(mid+1,end,2*tree_node+1,max(left,mid+1),right));
+}
+
+
+
+// query to find the gcd of a particular segment
+
+void build_segtree(int *arr,int*tree,int start,int end,int tree_node){
+  if(start == end){
+    tree[tree_node]=arr[start];
+    return;
+  }
+  int mid=(start+end)/2;
+  build_segtree(arr,tree,start,mid,2*tree_node);
+  build_segtree(arr,tree,mid+1,end,2*tree_node+1);
+  tree[tree_node]=__gcd(tree[2*tree_node],tree[2*tree_node+1]);
+}
+void update_segtree(int *arr,int *tree,int start,int end,int tree_node,int idx,int value){
+  if(start == end){
+    arr[idx]=value;  
+    tree[tree_node]=value;
+    return;
+  }
+  int mid=(start+end)/2;
+  if(idx > mid){
+    update_segtree(arr,tree,mid+1,end,2*tree_node+1,idx,value);
+  }
+  else{
+   update_segtree(arr,tree,start,mid,2*tree_node,idx,value); 
+  }
+  tree[tree_node]=__gcd(tree[2*tree_node],tree[2*tree_node+1]);
+}
+int range_query(int *tree,int start,int end,int tree_node,int left,int right){
+  if(start > right || end < left){
+    return  0;
+  }
+  if(start >= left&& end <= right){
+    return tree[tree_node];
+  }
+  int mid=(start+end)/2;
+  int ans1=range_query(tree,start,mid,2*tree_node,left,right);
+  int ans2=range_query(tree,mid+1,end,2*tree_node+1,left,right);
+  return __gcd(ans1,ans2);
+}
+
+// first index whose prefix sum is greater than the given sum
+
+
+void build_segtree(int *arr,int *tree,int start,int end,int tree_node){
+  if(start==end){
+    tree[tree_node]=arr[start];
+    return;
+  }
+  int mid=(start+end)/2;
+  build_segtree(arr,tree,start,mid,2*tree_node);
+  build_segtree(arr,tree,mid+1,end,2*tree_node+1);
+  tree[tree_node]=tree[2*tree_node]+tree[2*tree_node+1];
+}
+
+void update_segtree(int *arr,int *tree,int start,int end,int tree_node,int idx,int value){
+  if(start==end){
+    arr[idx]=value;
+    tree[tree_node]=value;
+    return;
+  }
+  int mid=(start+end)/2;
+  if(idx > mid){
+    update_segtree(arr,tree,start,mid,2*tree_node,idx,value);
+  }
+  else{
+    update_segtree(arr,tree,mid+1,end,2*tree_node+1,idx,value);
+  }
+  tree[tree_node]=tree[2*tree_node]+tree[2*tree_node+1];
+}
+
+int range_query(int *tree,int start,int end,int tree_node,int sum){
+  if(start==end){
+    return  start;
+  }
+  int mid=(start+end)/2;
+  if(sum <= tree[2*tree_node]){
+    return range_query(tree,start,mid,2*tree_node,sum);
+  }
+  else{
+    return range_query(tree,mid+1,end,2*tree_node+1,sum-tree[2*tree_node]);
+  }
+}
+
+
+// first index in a range greater than a particular sum
+int helper(int a,int b){
+  if(a!=0 && b!=0){
+    return a;
+  }
+  if(a>=b){
+    return a;
+  }
+  return b;
+}
+void build_segtree(int *arr,int *tree,int start,int end,int tree_node,int lower_bound){
+  if(start==end){
+    if(arr[start] > lower_bound){
+      tree[tree_node]=arr[start];
+    }
+    else{
+      tree[tree_node]=0;
+    }
+    return;
+  }
+  int mid=(start+end)/2;
+  build_segtree(arr,tree,start,mid,2*tree_node,lower_bound);
+  build_segtree(arr,tree,mid+1,end,2*tree_node+1,lower_bound);
+  tree[tree_node]=helper(tree[2*tree_node],tree[2*tree_node+1]);
+}
+void update_segtree(int *arr,int *tree,int start,int end,int tree_node,int idx,int value){
+  if(start==end){
+    arr[idx]=value;
+    if(tree[tree_node] > value){
+      tree[tree_node]=value;
+    }
+    else{
+      tree[tree_node]=0;
+    }
+    return;
+  }
+  int mid=(start+end)/2;
+  if(idx > mid){
+    update_segtree(arr,tree,mid+1,end,2*tree_node+1,idx,value);
+  }
+  else{
+    update_segtree(arr,tree,start,mid,2*tree_node,idx,value);
+  }
+  tree[tree_node]=helper(tree[2*tree_node],tree[2*tree_node+1]);
+}
+int range_query(int *tree,int start,int end,int tree_node,int left,int right){
+  if(start > right || end < left){
+    return 0;
+  }
+  if(start >= left && end <= right){
+    return tree[tree_node];
+  }
+  int mid=(start+end)/2;
+  int ans1=range_query(tree,start,mid,2*tree_node,left,right);
+  int ans2=range_query(tree,mid+1,end,2*tree_node+1,left,right);
+  return helper(ans1,ans2);
+}
+
+
+
+// maximal value in a segment means the maximum sum query from left to right in an array
+struct node{
+  int sum;
+  int prefix_sum;
+  int suffix_sum;
+  int ans;
+};
+node merge(node left,node right){
+  node res;
+  res.sum=left.sum+right.sum;
+  res.prefix_sum=max(left.prefix_sum,left.sum+right.prefix_sum);
+  res.suffix_sum=max(right.suffix_sum,right.sum+left.suffix_sum);
+  res.ans=max(max(left.ans,right.ans),left.suffix_sum+right.prefix_sum);
+  return res;
+}
+
+node format(int new_val){
+  node res;
+  res.sum=new_val;
+  res.prefix_sum=max(0,new_val);
+  res.suffix_sum=max(0,new_val);
+  res.ans=max(0,new_val);
+  return res;
+}
+
+node tree[400];
+void build_segtree(int *arr,int start,int end,int tree_node){
+  if(start==end){
+    tree[tree_node]=format(arr[start]);
+    return;
+  }
+  int mid=(start+end)/2;
+  build_segtree(arr,start,mid,2*tree_node);
+  build_segtree(arr,mid+1,end,2*tree_node+1);
+  tree[tree_node]=merge(tree[2*tree_node],tree[2*tree_node+1]);
+} 
+
+void update_segtree(int *arr,int start,int end,int tree_node,int idx,int value){
+  if(start==end){
+    arr[idx]=value;
+    tree[tree_node]=format(value);
+    return;
+  }
+  int mid=(start+end)/2;
+  if(idx > mid){
+    update_segtree(arr,mid+1,end,2*tree_node+1,idx,value);
+  }
+  else{
+    update_segtree(arr,start,mid,2*tree_node,idx,value);
+  }
+  tree[tree_node]=merge(tree[2*tree_node],tree[2*tree_node+1]);
+}
+node range_query(int start,int end,int tree_node,int left,int right){
+  if(left > right){
+    return format(0);
+  }
+  if(start==left && end == right){
+    return tree[tree_node];
+  }
+  int mid=(start+end)/2;
+  return merge(range_query(start,mid,2*tree_node,left,min(right,mid)),range_query(mid+1,end,2*tree_node+1,max(mid+1,left),right));
+}
+
+
+
+// sum of maximum pair sum that is the sum of maximum and second maximum in the array
+
+struct node{
+  int maximum;
+  int second_maximum;
+};
+node merge(node left,node right){
+  node res;
+  res.maximum=max(left.maximum,right.maximum);
+  res.second_maximum=min(max(left.maximum,right.second_maximum),max(right.maximum,left.second_maximum));
+  return res;  
+}
+node format(int new_val){
+  node res;
+  res.maximum=new_val;
+  res.second_maximum=INT_MIN;
+  return res;
+}
+node tree[400];
+void build_segtree(int *arr,int start,int end,int tree_node){
+  if(start==end){
+    tree[tree_node]=format(arr[start]);
+    return;
+  }
+  int mid=(start+end)/2;
+  build_segtree(arr,start,mid,2*tree_node);
+  build_segtree(arr,mid+1,end,2*tree_node+1);
+  tree[tree_node]=merge(tree[2*tree_node],tree[2*tree_node+1]);
+}
+void update_segtree(int *arr,int start,int end,int tree_node,int idx,int value){
+  if(start==end){
+    arr[idx]=value;
+    tree[tree_node]=format(arr[start]);
+    return;
+  }
+  int mid=(start+end)/2;
+  if(idx > mid){
+    update_segtree(arr,mid+1,end,2*tree_node+1,idx,value);
+  }
+  else{
+    update_segtree(arr,start,mid,2*tree_node,idx,value);
+  }
+  tree[tree_node]=merge(tree[2*tree_node],tree[2*tree_node+1]); 
+}
+
+node range_query(int start,int end,int tree_node,int left,int right){
+  if(left > right){
+    return format(0);
+  }
+  if(start==left && end==right){
+    return tree[tree_node];
+  }
+  int mid=(start+end)/2;
+  return merge(range_query(start,mid,2*tree_node,left,min(mid,right)),range_query(mid+1,end,2*tree_node+1,max(left,mid+1),right));  
+}
+
+
+
+// lazy propagation of trees
